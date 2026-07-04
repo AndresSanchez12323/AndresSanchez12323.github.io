@@ -1,3 +1,8 @@
+if (window.location.hostname === "andressanchez12323.github.io") {
+    const target = "https://andres-sanchez-portfolio.vercel.app" + window.location.pathname + window.location.search + window.location.hash;
+    window.location.replace(target);
+}
+
 let currentLang = localStorage.getItem("lang") || "es";
 let currentTheme = localStorage.getItem("theme") || "dark";
 let cachedProfile = null;
