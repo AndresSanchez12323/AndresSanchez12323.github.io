@@ -18,3 +18,5 @@ plans/
 # Entorno
 .env
 .env.local
+
+.vercel
