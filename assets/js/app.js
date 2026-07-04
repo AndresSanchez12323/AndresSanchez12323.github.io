@@ -904,11 +904,12 @@ function renderCertificates() {
         const url = `assets/certificates/${encodeURIComponent(c.file)}`;
         return `
             <div class="pdf-card">
-                <div class="pdf-preview">
+                <div class="pdf-preview" onclick="openCertModal('${url}')">
                     <object data="${url}" type="application/pdf">
                         <div class="pdf-preview-fallback">
                             <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/><path d="M8 12h8v2H8zm0 4h5v2H8zm0-8h3v2H8z"/></svg>
-                            <span>${t("cert_preview_unavailable")}</span>
+                            <span class="pdf-preview-name">${c.name}</span>
+                            <span class="pdf-preview-hint">${t("cert_btn_preview")}</span>
                         </div>
                     </object>
                 </div>
