@@ -365,6 +365,7 @@ body {
     border: none;
     cursor: pointer;
     padding: 4px;
+    margin: 0;
 }
 
 .nav-toggle span {
@@ -2150,6 +2151,10 @@ footer p::before {
         -webkit-backdrop-filter: none;
     }
 
+    .navbar.hidden {
+        transform: none !important;
+    }
+
     .nav-links {
         display: none;
         position: absolute;
@@ -2177,12 +2182,24 @@ footer p::before {
 
     .nav-toggle {
         display: flex;
+        position: fixed;
+        top: max(10px, env(safe-area-inset-top));
+        right: max(16px, env(safe-area-inset-right));
+        z-index: 1000;
+        width: 44px;
+        height: 44px;
+        box-sizing: border-box;
         background: rgba(255, 255, 255, 0.08);
         border-radius: 8px;
         padding: 8px 10px;
         gap: 5px;
         align-items: center;
         justify-content: center;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        contain: layout paint style;
+        isolation: isolate;
+        transform: translate3d(0, 0, 0);
     }
 
     .nav-toggle span {
@@ -2203,7 +2220,10 @@ footer p::before {
 
     .hero-title { font-size: clamp(1.6rem, 5vw, 2.4rem); }
 
-    .hero-subtitle { font-size: 0.92rem; }
+    .hero-subtitle {
+        font-size: 0.92rem;
+        min-height: 88px;
+    }
 
     .hero-actions {
         flex-direction: column;

@@ -214,15 +214,20 @@ function initNav() {
     const toggle = document.getElementById("navToggle");
     const links = document.getElementById("navLinks");
     if (toggle && links) {
+        const closeMenu = () => {
+            links.classList.remove("open");
+            toggle.classList.remove("open");
+            toggle.setAttribute("aria-expanded", "false");
+        };
+
         toggle.addEventListener("click", () => {
-            links.classList.toggle("open");
-            toggle.classList.toggle("open");
+            const isOpen = links.classList.toggle("open");
+            toggle.classList.toggle("open", isOpen);
+            toggle.setAttribute("aria-expanded", String(isOpen));
         });
+
         links.querySelectorAll(".nav-link").forEach((a) => {
-            a.addEventListener("click", () => {
-                links.classList.remove("open");
-                toggle.classList.remove("open");
-            });
+            a.addEventListener("click", closeMenu);
         });
     }
 
