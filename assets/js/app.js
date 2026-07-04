@@ -268,6 +268,8 @@ function initScrollNav() {
         lastScroll = current;
     }
 
+    updateNavVisibility();
+
     window.addEventListener("scroll", () => {
         if (window.innerWidth <= 768) return;
         if (links.classList.contains("open")) return;
