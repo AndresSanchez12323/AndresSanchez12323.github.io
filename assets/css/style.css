@@ -296,6 +296,13 @@ body {
     color: var(--accent);
 }
 
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
 .nav-link.active {
     text-shadow: 0 0 20px var(--accent-glow);
     animation: navActivePulse 2.5s ease-in-out infinite;
@@ -1712,6 +1719,12 @@ p {
     overflow: hidden;
     position: relative;
     border-bottom: 1px solid var(--stroke);
+    border-top: 0;
+    border-right: 0;
+    border-left: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
     cursor: pointer;
     display: flex;
     align-items: center;

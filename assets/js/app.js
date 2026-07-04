@@ -159,6 +159,34 @@ function t(key) {
     return TRANSLATIONS[currentLang]?.[key] ?? TRANSLATIONS["es"]?.[key] ?? key;
 }
 
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+    })[char]);
+}
+
+function safeURL(value, fallback = "#") {
+    try {
+        const url = new URL(String(value), window.location.origin);
+        return ["http:", "https:"].includes(url.protocol) ? url.href : fallback;
+    } catch {
+        return fallback;
+    }
+}
+
+function safeAssetPath(value, basePath) {
+    const name = String(value || "").replaceAll("\\", "/").split("/").pop();
+    return `${basePath}${encodeURIComponent(name)}`;
+}
+
+function externalLinkAttrs() {
+    return 'target="_blank" rel="noopener noreferrer"';
+}
+
 function getPreferredTheme() {
     const stored = localStorage.getItem("theme");
     if (stored) return stored;
@@ -338,8 +366,10 @@ function initCertModal() {
     if (!overlay) return;
 
     const open = (url) => {
+        const safe = String(url || "");
+        if (!safe.startsWith("assets/certificates/")) return;
         const iframe = document.getElementById("certModalIframe");
-        if (iframe) iframe.src = url;
+        if (iframe) iframe.src = safe;
         overlay.classList.add("open");
         document.body.style.overflow = "hidden";
     };
@@ -353,6 +383,11 @@ function initCertModal() {
 
     document.addEventListener("click", (e) => {
         if (e.target.id === "certModalClose") close();
+        const trigger = e.target.closest("[data-cert-url]");
+        if (trigger) {
+            e.preventDefault();
+            open(trigger.dataset.certUrl);
+        }
     });
     overlay.addEventListener("click", (e) => {
         if (e.target === overlay) close();
@@ -398,19 +433,21 @@ async function renderGitHub() {
         renderProjects(repos);
 
         const bio = profile.bio || "Desarrollador de software | Estudiante de Ingenier\u00eda en Inform\u00e1tica";
+        const profileUrl = safeURL(profile.html_url, "https://github.com/AndresSanchez12323");
+        const avatarUrl = safeURL(profile.avatar_url, "");
         profileEl.innerHTML = `
             <div class="github-avatar-wrap">
-                <img class="github-avatar" src="${profile.avatar_url}" alt="${profile.login}" loading="lazy">
+                <img class="github-avatar" src="${avatarUrl}" alt="${escapeHTML(profile.login)}" loading="lazy">
             </div>
             <div class="github-body">
-                <div class="github-name">${profile.name || profile.login}</div>
-                <div class="github-username">@${profile.login}</div>
-                <p class="github-bio">${bio}</p>
+                <div class="github-name">${escapeHTML(profile.name || profile.login)}</div>
+                <div class="github-username">@${escapeHTML(profile.login)}</div>
+                <p class="github-bio">${escapeHTML(bio)}</p>
                 <div class="github-stats">
-                    <span class="github-stat"><span class="github-stat-num">${profile.public_repos}</span> ${t("repos_label")}</span>
-                    <span class="github-stat"><span class="github-stat-num">${profile.followers}</span> ${t("followers_label")}</span>
-                    <span class="github-stat"><span class="github-stat-num">${profile.following}</span> ${t("following_label")}</span>
-                    <a class="btn btn-ghost" href="${profile.html_url}" target="_blank" rel="noreferrer">${t("view_github")}</a>
+                    <span class="github-stat"><span class="github-stat-num">${Number(profile.public_repos) || 0}</span> ${escapeHTML(t("repos_label"))}</span>
+                    <span class="github-stat"><span class="github-stat-num">${Number(profile.followers) || 0}</span> ${escapeHTML(t("followers_label"))}</span>
+                    <span class="github-stat"><span class="github-stat-num">${Number(profile.following) || 0}</span> ${escapeHTML(t("following_label"))}</span>
+                    <a class="btn btn-ghost" href="${profileUrl}" ${externalLinkAttrs()}>${escapeHTML(t("view_github"))}</a>
                 </div>
             </div>`;
 
@@ -420,22 +457,23 @@ async function renderGitHub() {
 
         reposEl.innerHTML = top.map((r) => {
             const langColor = getLangColor(r.language);
+            const repoUrl = safeURL(r.html_url);
             return `
             <article class="repo-card">
                 <div class="repo-head">
                     <svg class="repo-head-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.5.44v2.31c0 .138.112.25.25.25h2.31l-.001-.001-2.558-2.558Z"/></svg>
-                    <span class="repo-head-name">${r.name}</span>
+                    <span class="repo-head-name">${escapeHTML(r.name)}</span>
                 </div>
                 <div class="repo-body">
-                    <p>${r.description || t("no_description")}</p>
+                    <p>${escapeHTML(r.description || t("no_description"))}</p>
                 </div>
                 <div class="repo-foot">
                     <span style="display:inline-flex;align-items:center;gap:4px">
                         <span style="width:7px;height:7px;border-radius:50%;background:${langColor};flex-shrink:0"></span>
-                        ${r.language || t("no_language")}
+                        ${escapeHTML(r.language || t("no_language"))}
                     </span>
-                    <span>\u2b50 ${r.stargazers_count}</span>
-                    <a href="${r.html_url}" target="_blank" rel="noreferrer" style="color:var(--accent);text-decoration:none;margin-left:auto">${t("view_repo")} \u2192</a>
+                    <span>\u2b50 ${Number(r.stargazers_count) || 0}</span>
+                    <a href="${repoUrl}" ${externalLinkAttrs()} style="color:var(--accent);text-decoration:none;margin-left:auto">${escapeHTML(t("view_repo"))} \u2192</a>
                 </div>
             </article>`;
         }).join("");
@@ -757,23 +795,23 @@ function renderWorkingOn(repos) {
         })();
         const firstLine = (r.description || t("no_description")).split("\n")[0];
         return `
-            <article class="working-card" style="--i:${i}" data-lang="${r.language || ""}">
+            <article class="working-card" style="--i:${i}" data-lang="${escapeHTML(r.language || "")}">
                 <div class="working-bar" style="background:${langColor}"></div>
                 <div class="working-inner">
                     <div class="working-meta">
-                        <span class="working-lang" style="color:${langColor}">${r.language || t("no_language")}</span>
+                        <span class="working-lang" style="color:${langColor}">${escapeHTML(r.language || t("no_language"))}</span>
                         <span class="working-time">
                             <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1" fill="none"/><path d="M5 3v2.5L7 7" stroke="currentColor" stroke-width="1" fill="none"/></svg>
-                            ${ago}
+                            ${escapeHTML(ago)}
                         </span>
                     </div>
-                    <h3 class="working-name">${r.name}</h3>
-                    <p class="working-desc">${firstLine}</p>
+                    <h3 class="working-name">${escapeHTML(r.name)}</h3>
+                    <p class="working-desc">${escapeHTML(firstLine)}</p>
                     <div class="working-foot">
                         <div class="working-stats">
                             <span class="working-stat">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 2c4.418 0 8 3.582 8 8s-3.582 8-8 8-8-3.582-8-8 3.582-8 8-8zm-1 4v4H8l4 4 4-4h-3V8h-2z"/></svg>
-                                ${r.stargazers_count}
+                                ${Number(r.stargazers_count) || 0}
                             </span>
                         </div>
                         <span class="working-arrow">
@@ -807,11 +845,15 @@ function openProjectGallery(repoName) {
     const imgs = media.images.map(f => base + encodeURI(f));
     let idx = 0;
 
+    function backdropHandler(e) {
+        if (e.target === overlay) closeGallery();
+    }
+
     function restoreModal() {
         overlay.classList.remove("open");
         document.body.style.overflow = "";
-        overlay.querySelector(".modal-content").innerHTML = '<button class="modal-close" id="certModalClose">&times;</button><iframe class="modal-iframe" id="certModalIframe"></iframe>';
-        overlay.onclick = null;
+        overlay.querySelector(".modal-content").innerHTML = '<button class="modal-close" id="certModalClose" aria-label="Cerrar">&times;</button><iframe class="modal-iframe" id="certModalIframe" title="Certificado" loading="lazy" referrerpolicy="no-referrer"></iframe>';
+        overlay.removeEventListener("click", backdropHandler);
     }
 
     function closeGallery() {
@@ -832,12 +874,12 @@ function openProjectGallery(repoName) {
             </div>`;
         overlay.classList.add("open");
         document.body.style.overflow = "hidden";
-        document.getElementById("galleryClose").onclick = closeGallery;
+        document.getElementById("galleryClose").addEventListener("click", closeGallery);
         overlay.querySelector(".gallery-prev")?.addEventListener("click", () => { idx--; show(); });
         overlay.querySelector(".gallery-next")?.addEventListener("click", () => { idx++; show(); });
-        overlay.onclick = (e) => { if (e.target === overlay) closeGallery(); };
-        document.addEventListener("keydown", escHandler);
     }
+    overlay.addEventListener("click", backdropHandler);
+    document.addEventListener("keydown", escHandler);
     show();
 }
 
@@ -860,9 +902,10 @@ function renderProjects(repos) {
         let live = null;
         if (r.homepage && r.homepage.startsWith("http")) {
             try {
-                const demoHost = new URL(r.homepage).hostname.toLowerCase();
+                const demoUrl = new URL(r.homepage);
+                const demoHost = demoUrl.hostname.toLowerCase();
                 if (!blockedDemoHosts.has(demoHost)) {
-                    live = r.homepage;
+                    live = safeURL(demoUrl.href, null);
                 }
             } catch (_) {
                 live = null;
@@ -876,49 +919,56 @@ function renderProjects(repos) {
             previewInner = `<video class="project-preview-video" src="${base}${media.video}" autoplay loop muted playsinline></video>`;
         } else if (media && media.images && media.images.length > 0) {
             const firstImg = base + media.images[0];
-            previewInner = `<img class="project-preview-img" src="${firstImg}" alt="${r.name}" loading="lazy" onclick="event.stopPropagation();openProjectGallery('${r.name}')">`;
+            previewInner = `<img class="project-preview-img" src="${firstImg}" alt="${escapeHTML(r.name)}" loading="lazy" data-gallery-repo="${escapeHTML(r.name)}">`;
             if (media.images.length > 1) {
                 const n = media.images.length;
-                previewInner += `<button class="project-preview-btn" onclick="event.stopPropagation();openProjectGallery('${r.name}')">${n < 10 ? "0" : ""}${n} <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M1 1h3v3H1zm5 0h3v3H6zM1 6h3v3H1zm5 0h3v3H6z"/></svg></button>`;
+                previewInner += `<button class="project-preview-btn" type="button" data-gallery-repo="${escapeHTML(r.name)}">${n < 10 ? "0" : ""}${n} <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M1 1h3v3H1zm5 0h3v3H6zM1 6h3v3H1zm5 0h3v3H6z"/></svg></button>`;
             }
         } else {
             previewInner = `<div class="project-preview-bg" style="background:linear-gradient(135deg, ${langColor}44, ${langColor}11)"></div>
                 <div class="project-preview-overlay"></div>
                 <div class="project-preview-code"><span></span><span></span><span></span></div>`;
         }
+        const repoUrl = safeURL(r.html_url);
         return `
             <article class="project-card" style="--i: ${i}">
                 <div class="project-preview${media ? " project-preview-has-media" : ""}"${!media ? ` style="background:${langColor}22"` : ""}>
                     ${previewInner}
-                    <span class="project-preview-name">${r.name}</span>
+                    <span class="project-preview-name">${escapeHTML(r.name)}</span>
                 </div>
                 <div class="project-body">
-                    <p class="project-desc">${r.description || t("no_description_alt")}</p>
+                    <p class="project-desc">${escapeHTML(r.description || t("no_description_alt"))}</p>
                     <div class="project-tags">
                         <span class="project-tag">
                             <span class="project-tag-dot" style="background:${langColor}"></span>
-                            ${r.language || t("no_language_alt")}
+                            ${escapeHTML(r.language || t("no_language_alt"))}
                         </span>
-                        <span class="project-tag">\u2b50 ${r.stargazers_count}</span>
+                        <span class="project-tag">\u2b50 ${Number(r.stargazers_count) || 0}</span>
                         <span class="project-tag">${new Date(r.updated_at).toLocaleDateString(locale)}</span>
                     </div>
                     <div class="project-actions">
-                        <a class="btn btn-ghost" href="${r.html_url}" target="_blank" rel="noreferrer">${t("repo_btn")}</a>
-                        ${live ? `<a class="btn" href="${live}" target="_blank" rel="noreferrer">${t("demo_btn")}</a>` : ""}
+                        <a class="btn btn-ghost" href="${repoUrl}" ${externalLinkAttrs()}>${escapeHTML(t("repo_btn"))}</a>
+                        ${live ? `<a class="btn" href="${live}" ${externalLinkAttrs()}>${escapeHTML(t("demo_btn"))}</a>` : ""}
                         ${r.name === "Cubo-PS2-" ? `
-                        <a class="btn" href="https://mega.nz/folder/MqxF1Jja#WjqRnJQB9540p1DsQbs2nw" target="_blank" rel="noreferrer" style="display:inline-flex;align-items:center;gap:6px">
+                        <a class="btn" href="https://mega.nz/folder/MqxF1Jja#WjqRnJQB9540p1DsQbs2nw" ${externalLinkAttrs()} style="display:inline-flex;align-items:center;gap:6px">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 2c4.418 0 8 3.582 8 8s-3.582 8-8 8-8-3.582-8-8 3.582-8 8-8zm-1 4v4H8l4 4 4-4h-3V8h-2z"/></svg>
-                            ${t("cubo_iso")}
+                            ${escapeHTML(t("cubo_iso"))}
                         </a>
-                        <a class="btn btn-ghost" href="https://pcsx2.net/" target="_blank" rel="noreferrer" style="display:inline-flex;align-items:center;gap:6px">
+                        <a class="btn btn-ghost" href="https://pcsx2.net/" ${externalLinkAttrs()} style="display:inline-flex;align-items:center;gap:6px">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 2.5h17v3h-17zm0 5h17v3h-17zm0 5h17v3h-17zm0 5h17v3h-17z"/><circle cx="6" cy="5" r="1.5" fill="currentColor"/><circle cx="6" cy="10" r="1.5" fill="currentColor"/><circle cx="6" cy="15" r="1.5" fill="currentColor"/><circle cx="6" cy="20" r="1.5" fill="currentColor"/></svg>
-                            ${t("cubo_emu")}
+                            ${escapeHTML(t("cubo_emu"))}
                         </a>
                         ` : ""}
                     </div>
                 </div>
             </article>`;
     }).join("");
+    grid.querySelectorAll("[data-gallery-repo]").forEach((trigger) => {
+        trigger.addEventListener("click", (event) => {
+            event.stopPropagation();
+            openProjectGallery(trigger.dataset.galleryRepo);
+        });
+    });
 }
 
 // ============================
@@ -970,7 +1020,7 @@ function renderCertificates() {
     ];
 
     grid.innerHTML = certs.map((c) => {
-        const url = `assets/certificates/${encodeURIComponent(c.file)}`;
+        const url = safeAssetPath(c.file, "assets/certificates/");
         const provider = getCertProvider(c.name);
         const accentColor = provider.color;
         let iconHtml = "";
@@ -984,21 +1034,21 @@ function renderCertificates() {
         }
         return `
             <div class="pdf-card" style="--pdf-accent: ${accentColor}">
-                <div class="pdf-preview" onclick="openCertModal('${url}')">
+                <button class="pdf-preview" type="button" data-cert-url="${url}" aria-label="${escapeHTML(t("cert_btn_preview"))}: ${escapeHTML(c.name)}">
                     <div class="pdf-preview-bg" style="background: radial-gradient(circle at 30% 40%, ${accentColor}22, transparent 70%), radial-gradient(circle at 70% 80%, ${accentColor}11, transparent 50%)"></div>
                     <div class="pdf-preview-visual">
                         ${iconHtml}
-                        <span class="pdf-preview-name">${c.name}</span>
+                        <span class="pdf-preview-name">${escapeHTML(c.name)}</span>
                     </div>
                     <div class="pdf-preview-overlay">
-                        <span class="pdf-preview-hint" style="border-color: ${accentColor}; color: ${accentColor}">${t("cert_btn_preview")}</span>
+                        <span class="pdf-preview-hint" style="border-color: ${accentColor}; color: ${accentColor}">${escapeHTML(t("cert_btn_preview"))}</span>
                     </div>
-                </div>
+                </button>
                 <div class="pdf-body">
-                    <h3>${c.name}</h3>
-                    ${provider.label ? `<span class="pdf-badge" style="background: ${accentColor}22; color: ${accentColor}; border-color: ${accentColor}44">${provider.label}</span>` : ""}
+                    <h3>${escapeHTML(c.name)}</h3>
+                    ${provider.label ? `<span class="pdf-badge" style="background: ${accentColor}22; color: ${accentColor}; border-color: ${accentColor}44">${escapeHTML(provider.label)}</span>` : ""}
                     <div class="pdf-actions">
-                        <button class="btn" onclick="openCertModal('${url}')" style="background: ${accentColor}; color: #fff">${t("cert_btn_preview")}</button>
+                        <button class="btn" type="button" data-cert-url="${url}" style="background: ${accentColor}; color: #fff">${escapeHTML(t("cert_btn_preview"))}</button>
                     </div>
                 </div>
             </div>`;
@@ -1015,11 +1065,11 @@ function renderExperience() {
     el.innerHTML = items.map((i) => `
         <div class="timeline-item">
             <span class="timeline-dot"></span>
-            <span class="timeline-date">${i.date}</span>
+            <span class="timeline-date">${escapeHTML(i.date)}</span>
             <div class="timeline-content">
-                <div class="timeline-role">${i.role}</div>
-                <div class="timeline-company"><span class="timeline-prompt">$</span> ${i.company}</div>
-                <p class="timeline-desc">${i.desc}</p>
+                <div class="timeline-role">${escapeHTML(i.role)}</div>
+                <div class="timeline-company"><span class="timeline-prompt">$</span> ${escapeHTML(i.company)}</div>
+                <p class="timeline-desc">${escapeHTML(i.desc)}</p>
             </div>
         </div>`).join("");
 }

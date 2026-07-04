@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">ES logo</title>
+  <desc id="desc">Monogram logo for Edwin Sanchez portfolio.</desc>
+  <rect width="512" height="512" rx="96" fill="#060b14"/>
+  <circle cx="256" cy="256" r="188" fill="none" stroke="#67e8f9" stroke-width="12" opacity="0.45"/>
+  <path d="M147 168h129v46h-76v38h67v43h-67v47h82v46H147V168Z" fill="#edf2f7"/>
+  <path d="M315 392c-31 0-58-8-81-25l24-42c17 12 36 19 56 19 21 0 34-8 34-22 0-15-13-22-45-35-39-16-62-35-62-72 0-42 33-70 84-70 28 0 52 7 72 20l-22 42c-16-9-32-14-49-14-19 0-30 8-30 20 0 14 13 21 43 33 42 17 65 36 65 74 0 45-35 72-89 72Z" fill="#67e8f9"/>
+</svg>
