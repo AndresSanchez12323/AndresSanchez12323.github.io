@@ -85,7 +85,6 @@
 }
 
 [data-theme="light"] .pdf-preview {
-    background: rgba(0,0,0,0.04);
     border-bottom-color: var(--stroke);
 }
 
@@ -159,7 +158,6 @@ body {
     color: var(--text-main);
     line-height: 1.6;
     font-family: 'Inter', sans-serif;
-    scroll-behavior: smooth;
 }
 
 ::-webkit-scrollbar {
@@ -307,11 +305,25 @@ body {
     50% { text-shadow: 0 0 24px var(--accent-glow-strong), 0 0 40px var(--accent-glow); }
 }
 
-.nav-toggles {
+.nav-toggles-item {
+    display: flex;
+    align-items: center;
+}
+
+.nav-toggles-item .nav-toggles {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-left: 12px;
+}
+
+@media (min-width: 769px) {
+    .nav-links {
+        flex: 1;
+        justify-content: center;
+    }
+    .nav-toggles-item {
+        margin-left: auto;
+    }
 }
 
 .nav-toggle-btn {
@@ -367,6 +379,12 @@ body {
 .nav-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
 .nav-toggle.open span:nth-child(2) { opacity: 0; }
 .nav-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+@media (max-width: 768px) {
+    .nav-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+}
 
 /* ============================
    Page Layout
@@ -572,6 +590,12 @@ body {
     padding: 0 24px;
 }
 
+@media (max-width: 480px) {
+    .content-section {
+        padding: 0 12px;
+    }
+}
+
 /* ============================
    Scroll Reveal
    ============================ */
@@ -729,7 +753,8 @@ body {
     line-height: 1.6;
     white-space: pre-wrap;
     color: var(--text-main);
-    min-height: 180px;
+    height: 280px;
+    overflow-y: auto;
 }
 
 .terminal-line {
@@ -1649,88 +1674,155 @@ p {
    ============================ */
 .pdf-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 24px;
     margin-top: 32px;
 }
 
 .pdf-card {
-    background: rgba(11, 15, 20, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--bg-card);
+    border: 1px solid var(--stroke);
     border-radius: 16px;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .pdf-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 20px var(--accent-glow), 0 0 40px var(--accent-glow);
+    transform: translateY(-6px);
+    border-color: var(--pdf-accent, var(--accent));
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.35),
+        0 0 24px color-mix(in srgb, var(--pdf-accent, var(--accent)) 20%, transparent),
+        0 0 48px color-mix(in srgb, var(--pdf-accent, var(--accent)) 10%, transparent);
 }
 
 .pdf-preview {
     width: 100%;
-    height: 180px;
+    aspect-ratio: 4 / 3;
     overflow: hidden;
-    background: rgba(0,0,0,0.3);
     position: relative;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid var(--stroke);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.pdf-preview object {
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
+.pdf-preview-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
 }
 
-.pdf-preview-fallback {
+.pdf-card:hover .pdf-preview-bg {
+    opacity: 0.8;
+}
+
+.pdf-preview-visual {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    gap: 8px;
-    color: var(--text-muted);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
-    padding: 16px;
+    gap: 14px;
+    padding: 24px;
     text-align: center;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.pdf-preview-fallback svg {
-    width: 44px;
-    height: 44px;
-    fill: var(--accent);
-    opacity: 0.5;
+.pdf-card:hover .pdf-preview-visual {
+    transform: scale(0.92);
+}
+
+.pdf-preview-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px color-mix(in srgb, var(--pdf-accent, var(--accent)) 40%, transparent));
+    transition: filter 0.3s ease;
+}
+
+.pdf-card:hover .pdf-preview-icon {
+    filter: drop-shadow(0 0 20px color-mix(in srgb, var(--pdf-accent, var(--accent)) 60%, transparent));
 }
 
 .pdf-preview-name {
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    color: var(--text);
-    line-height: 1.3;
+    color: var(--text-muted);
+    line-height: 1.4;
+    font-family: 'JetBrains Mono', monospace;
+    max-width: 90%;
+}
+
+.pdf-preview-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+}
+
+.pdf-preview:hover .pdf-preview-overlay {
+    opacity: 1;
 }
 
 .pdf-preview-hint {
-    font-size: 0.72rem;
-    color: var(--accent);
-    opacity: 0.8;
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid;
+    padding: 10px 24px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.6);
+    transition: transform 0.2s ease;
+}
+
+.pdf-preview-hint:hover {
+    transform: scale(1.05);
 }
 
 .pdf-body {
-    padding: 20px 24px 24px;
+    padding: 18px 20px 20px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
     flex: 1;
+    position: relative;
 }
 
 .pdf-body h3 {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-main);
+    line-height: 1.3;
+    padding-right: 70px;
+}
+
+.pdf-badge {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 6px;
+    border: 1px solid;
 }
 
 .pdf-actions {
@@ -1738,6 +1830,11 @@ p {
     gap: 10px;
     flex-wrap: wrap;
     margin-top: auto;
+}
+
+.pdf-actions .btn {
+    font-size: 0.78rem;
+    padding: 9px 18px;
 }
 
 /* ============================
@@ -2036,27 +2133,58 @@ footer p::before {
 @media (max-width: 768px) {
     .page { gap: 32px; }
 
+    .navbar {
+        background: rgba(6, 11, 20, 0.95);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
+    [data-theme="light"] .navbar {
+        background: rgba(248, 250, 252, 0.95);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+
     .nav-links {
         display: none;
         position: absolute;
         top: var(--nav-h);
         left: 0; right: 0;
         flex-direction: column;
-        background: rgba(6, 11, 20, 0.95);
-        backdrop-filter: blur(12px);
+        background: rgba(6, 11, 20, 0.97);
         border-bottom: 1px solid var(--stroke);
-        padding: 12px;
-        gap: 4px;
+        padding: 8px 12px 16px;
+        gap: 2px;
     }
 
     .nav-links.open { display: flex; }
 
     [data-theme="light"] .nav-links {
-        background: transparent;
-        backdrop-filter: none;
+        background: rgba(255, 255, 255, 0.97);
     }
 
-    .nav-toggle { display: flex; }
+    .nav-toggles-item {
+        margin-top: 10px;
+        padding-top: 12px;
+        border-top: 1px solid var(--stroke);
+        justify-content: center;
+    }
+
+    .nav-toggle {
+        display: flex;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 8px 10px;
+        gap: 5px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-toggle span {
+        width: 20px;
+        height: 2.5px;
+        background: var(--text-main);
+    }
 
     .hero { padding: 40px 16px; min-height: auto; }
 
@@ -2115,6 +2243,10 @@ footer p::before {
 
     .pdf-grid { grid-template-columns: repeat(2, 1fr); }
 
+    .pdf-body h3 { padding-right: 0; }
+
+    .pdf-badge { position: static; display: inline-block; width: fit-content; }
+
     .skills-cloud { gap: 8px; }
 
     .skill-chip {
@@ -2128,62 +2260,9 @@ footer p::before {
 
     .timeline-item { padding: 14px 16px 16px; }
 
-    .terminal-output { font-size: 0.85rem; }
-
-    .resume-inner {
-        flex-direction: column;
-        gap: 16px;
-        text-align: center;
-    }
-
-    .resume-actions { justify-content: center; }
-
-    .modal-content { height: 70vh; }
-}
-
-@media (max-width: 480px) {
-    .page { gap: 24px; }
-
-    .nav-link {
-        font-size: 0.75rem;
-        padding: 10px 14px;
-    }
-
-    .hero { padding: 24px 12px; min-height: auto; }
-
-    .hero-content { gap: 8px; }
-
-    .hero-avatar {
-        width: 100px;
-        height: 100px;
-        margin-bottom: 0;
-    }
-
-    .hero-title { font-size: clamp(1.3rem, 6vw, 1.6rem); }
-
-    .hero-subtitle { font-size: 0.85rem; }
-
-    .hero-actions { margin-top: 0; }
-
-    .scroll-indicator { margin-top: 0; }
-
-    .section-card {
-        padding: 18px 12px;
-        border-radius: 14px;
-    }
-
-    .section-card h2 {
-        font-size: clamp(1rem, 4vw, 1.2rem);
-        padding-bottom: 8px;
-    }
-
-    section p { font-size: 0.88rem; }
-
-    .terminal-body { padding: 14px 12px 18px; }
-
     .terminal-output {
-        font-size: 0.75rem;
-        min-height: 100px;
+        font-size: 0.85rem;
+        height: 220px;
     }
 
     .terminal-header {
@@ -2209,86 +2288,95 @@ footer p::before {
         padding: 7px 12px;
     }
 
-    .pdf-grid { grid-template-columns: 1fr; }
+    @media (max-width: 480px) {
+        .pdf-grid { grid-template-columns: 1fr; gap: 16px; }
 
-    .pdf-body { padding: 12px 14px 16px; }
+        .pdf-body { padding: 14px 16px 18px; }
 
-    .pdf-body h3 { font-size: 0.9rem; }
+        .pdf-body h3 { font-size: 0.88rem; padding-right: 0; }
 
-    .pdf-actions .btn { font-size: 0.72rem; padding: 7px 14px; }
+        .pdf-badge { position: static; display: inline-block; width: fit-content; font-size: 0.6rem; }
 
-    .skills-cloud { gap: 6px; }
+        .pdf-actions .btn { font-size: 0.72rem; padding: 8px 16px; }
 
-    .skill-chip {
-        padding: 4px 8px 4px 4px;
-        font-size: 0.72rem;
-        gap: 4px;
+        .skills-cloud { gap: 6px; }
+
+        .skill-chip {
+            padding: 4px 8px 4px 4px;
+            font-size: 0.72rem;
+            gap: 4px;
+        }
+
+        .skill-icon-wrap {
+            width: 32px;
+            height: 32px;
+        }
+
+        .skill-ring { display: none; }
+
+        .skill-icon { width: 16px; height: 16px; }
+
+        .social-card { padding: 14px 10px; }
+
+        .social-icon {
+            width: 36px;
+            height: 36px;
+        }
+
+        .social-label { font-size: 0.8rem; }
+
+        .github-avatar { width: 60px; height: 60px; }
+
+        .github-name { font-size: 1rem; }
+
+        .github-bio { font-size: 0.8rem; }
+
+        .github-stats { font-size: 0.72rem; }
+
+        .modal-content {
+            height: 55vh;
+            border-radius: 12px;
+        }
+
+        .modal-close {
+            width: 30px;
+            height: 30px;
+            font-size: 1.1rem;
+        }
+
+        .timeline { padding-left: 18px; gap: 14px; }
+
+        .timeline-item { padding: 12px 12px 14px; }
+
+        .timeline-date { font-size: 0.68rem; padding: 2px 8px; }
+
+        .timeline-role { font-size: 0.88rem; }
+
+        .timeline-company { font-size: 0.78rem; }
+
+        .timeline-desc { font-size: 0.78rem; }
+
+        .timeline::before { left: 8px; }
+
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            left: -16px;
+            top: 20px;
+        }
+
+        .btn {
+            font-size: 0.72rem;
+            padding: 8px 16px;
+        }
+
+        footer { padding: 20px 12px 40px; }
+
+        footer p { font-size: 0.75rem; }
+
+        .terminal-output {
+            font-size: 0.75rem;
+            height: 180px;
+        }
     }
-
-    .skill-icon-wrap {
-        width: 32px;
-        height: 32px;
-    }
-
-    .skill-ring { display: none; }
-
-    .skill-icon { width: 16px; height: 16px; }
-
-    .social-card { padding: 14px 10px; }
-
-    .social-icon {
-        width: 36px;
-        height: 36px;
-    }
-
-    .social-label { font-size: 0.8rem; }
-
-    .github-avatar { width: 60px; height: 60px; }
-
-    .github-name { font-size: 1rem; }
-
-    .github-bio { font-size: 0.8rem; }
-
-    .github-stats { font-size: 0.72rem; }
-
-    .modal-content {
-        height: 55vh;
-        border-radius: 12px;
-    }
-
-    .modal-close {
-        width: 30px;
-        height: 30px;
-        font-size: 1.1rem;
-    }
-
-    .timeline { padding-left: 18px; gap: 14px; }
-
-    .timeline-item { padding: 12px 12px 14px; }
-
-    .timeline-date { font-size: 0.68rem; padding: 2px 8px; }
-
-    .timeline-role { font-size: 0.88rem; }
-
-    .timeline-company { font-size: 0.78rem; }
-
-    .timeline-desc { font-size: 0.78rem; }
-
-    .timeline::before { left: 8px; }
-
-    .timeline-dot {
-        width: 10px;
-        height: 10px;
-        left: -16px;
-        top: 20px;
-    }
-
-    .btn {
-        font-size: 0.72rem;
-        padding: 8px 16px;
-    }
-
-    footer { padding: 20px 12px 40px; }
-
-    footer p { font-size: 0.75rem; }
 }

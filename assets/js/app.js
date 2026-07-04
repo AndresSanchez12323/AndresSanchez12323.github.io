@@ -254,13 +254,29 @@ function initNav() {
 // ============================
 function initScrollNav() {
     const nav = document.querySelector(".navbar");
-    if (!nav) return;
+    const links = document.getElementById("navLinks");
+    if (!nav || !links) return;
     let lastScroll = 0;
+
+    function updateNavVisibility() {
+        if (window.innerWidth <= 768) {
+            nav.classList.remove("hidden");
+            return;
+        }
+        const current = window.scrollY;
+        nav.classList.toggle("hidden", current > lastScroll && current > 80);
+        lastScroll = current;
+    }
+
     window.addEventListener("scroll", () => {
+        if (window.innerWidth <= 768) return;
+        if (links.classList.contains("open")) return;
         const current = window.scrollY;
         nav.classList.toggle("hidden", current > lastScroll && current > 80);
         lastScroll = current;
     }, { passive: true });
+
+    window.addEventListener("resize", updateNavVisibility);
 }
 
 // ============================
@@ -826,11 +842,25 @@ function renderProjects(repos) {
         return;
     }
     const locale = currentLang === "es" ? "es-ES" : "en-US";
+    const blockedDemoHosts = new Set([
+        "andressanchez12323.github.io",
+        "perfil-github-nu.vercel.app",
+    ]);
     const items = repos.filter((r) => !r.fork && !EXCLUDED_PROJECTS.includes(r.name))
         .sort((a, b) => b.stargazers_count - a.stargazers_count || new Date(b.updated_at) - new Date(a.updated_at))
         .slice(0, 6);
     grid.innerHTML = items.map((r, i) => {
-        const live = r.homepage && r.homepage.startsWith("http") ? r.homepage : null;
+        let live = null;
+        if (r.homepage && r.homepage.startsWith("http")) {
+            try {
+                const demoHost = new URL(r.homepage).hostname.toLowerCase();
+                if (!blockedDemoHosts.has(demoHost)) {
+                    live = r.homepage;
+                }
+            } catch (_) {
+                live = null;
+            }
+        }
         const langColor = getLangColor(r.language);
         const media = PROJECT_MEDIA[r.name];
         const base = media ? "assets/img/projects/" + media.folder + "/" : null;
@@ -887,6 +917,33 @@ function renderProjects(repos) {
 // ============================
 // Certificates
 // ============================
+const CERT_INLINE_ICONS = {
+    ibm: '<svg fill="#0062FF" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 16.144h4.667v.668H0zM0 14.862h4.667v.67H0zM1.33 13.583h2.003v.671H1.33zM1.33 12.305h2.003v.67H1.33zM1.33 11.025h2.003v.671H1.33zM1.33 9.744h2.003v.671H1.33zM0 8.466h4.667v.67H0zM0 7.187h4.667v.67H0zM5.332 15.532h7.177c.12-.206.212-.433.267-.67H5.333v.67zM11.95 12.305H6.667v.67h5.843a2.67 2.67 0 00-.558-.67zM6.666 11.025v.671h5.285c.223-.188.41-.414.559-.671H6.666zM12.509 8.466H5.332v.67h7.443a2.891 2.891 0 00-.266-.67zM10.303 7.187H5.332v.67h6.685a2.522 2.522 0 00-1.714-.67zM6.666 9.744h2v.671h-2zM10.667 10.415h2.092c.059-.214.09-.44.09-.671h-2.182v.671zM6.666 13.583h1.999v.671h-2zM10.667 13.583v.671h2.182c0-.23-.031-.457-.09-.671h-2.092zM5.332 16.807l4.97.007c.667 0 1.268-.257 1.717-.67H5.332v.663zM13.334 16.144h3.332v.668h-3.332zM13.334 14.862h3.332v.67h-3.332zM14.665 13.583h2v.671h-2zM14.665 12.305h2v.67h-2zM17.594 8.466h-4.26v.67h4.49zM17.152 7.187h-3.818v.669h4.048zM20.665 16.144H24v.668h-3.335zM20.665 14.862H24v.67h-3.335zM20.665 13.583h2v.671h-2zM20.665 12.305h2v.67h-2zM20.665 11.696h2v-.671h-3.811l-.188.542-.188-.542H14.665v.671h2v-.616l.213.616h3.575l.212-.616zM22.666 9.744h-3.37l-.23.671h3.6zM20.183 7.187l-.231.669H24v-.669zM18.666 16.807l.23-.663h-.461zM18.224 15.532h.884l.238-.67h-1.357zM17.775 14.254h1.782l.235-.671h-2.253zM17.327 12.975h2.679l.229-.67h-3.138zM14.665 10.415h3.602l-.231-.671h-3.371zM19.51 9.136H24v-.67h-4.262z"/></svg>',
+    bigschool: '<svg fill="#67e8f9" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2L1 9l11 7 11-7-11-7z"/><path d="M1 9v5l11 7 11-7V9l-11 7L1 9z" opacity="0.4"/><path d="M1 14v5l11 7 11-7v-5l-11 7L1 14z" opacity="0.25"/></svg>',
+    dnda: '<svg fill="#e74c3c" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#e74c3c" stroke-width="1.6"/><path d="M8.5 12c0-2.5 1.5-4.5 4-4.5 1 0 2 .3 2.8 1l1.2-1.5C15.5 6 14 5.5 12.5 5.5 9 5.5 6.5 8.3 6.5 12s2.5 6.5 6 6.5c1.5 0 3-.5 4-1.5l-1.2-1.5c-.8.7-1.8 1-2.8 1-2.5 0-4-2-4-4.5z"/></svg>',
+};
+
+const CERT_PROVIDERS = {
+    ibm: { icon: "ibm", color: "#0062FF", label: "IBM" },
+    google: { slug: "google", color: "#4285F4", label: "Google" },
+    mongodb: { slug: "mongodb", color: "#47A248", label: "MongoDB" },
+    linux: { slug: "linux", color: "#FCC624", label: "Linux" },
+    bigschool: { icon: "bigschool", color: "#67e8f9", label: "BIG school" },
+    dnda: { icon: "dnda", color: "#e74c3c", label: "DNDA" },
+    default: { slug: null, color: "#67e8f9", label: "" },
+};
+
+function getCertProvider(name) {
+    const n = name.toLowerCase();
+    if (n.includes("ibm")) return CERT_PROVIDERS.ibm;
+    if (n.includes("google")) return CERT_PROVIDERS.google;
+    if (n.includes("mongo")) return CERT_PROVIDERS.mongodb;
+    if (n.includes("linux")) return CERT_PROVIDERS.linux;
+    if (n.includes("industria")) return CERT_PROVIDERS.dnda;
+    if (n.includes("certificado")) return CERT_PROVIDERS.bigschool;
+    return CERT_PROVIDERS.default;
+}
+
 function renderCertificates() {
     const grid = document.getElementById("certificates-grid");
     if (!grid) return;
@@ -907,21 +964,34 @@ function renderCertificates() {
 
     grid.innerHTML = certs.map((c) => {
         const url = `assets/certificates/${encodeURIComponent(c.file)}`;
+        const provider = getCertProvider(c.name);
+        const accentColor = provider.color;
+        let iconHtml = "";
+        if (provider.icon && CERT_INLINE_ICONS[provider.icon]) {
+            const b64 = btoa(CERT_INLINE_ICONS[provider.icon]);
+            iconHtml = `<img class="pdf-preview-icon" src="data:image/svg+xml;base64,${b64}" alt="" width="44" height="44" loading="lazy">`;
+        } else if (provider.slug) {
+            iconHtml = `<img class="pdf-preview-icon" src="https://cdn.simpleicons.org/${provider.slug}/${accentColor.replace("#", "")}" alt="" width="44" height="44" loading="lazy">`;
+        } else {
+            iconHtml = `<svg class="pdf-preview-icon" viewBox="0 0 24 24" fill="${accentColor}"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M8 12h8v2H8zm0 4h5v2H8zm0-8h3v2H8z"/></svg>`;
+        }
         return `
-            <div class="pdf-card">
+            <div class="pdf-card" style="--pdf-accent: ${accentColor}">
                 <div class="pdf-preview" onclick="openCertModal('${url}')">
-                    <object data="${url}" type="application/pdf">
-                        <div class="pdf-preview-fallback">
-                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"/><path d="M8 12h8v2H8zm0 4h5v2H8zm0-8h3v2H8z"/></svg>
-                            <span class="pdf-preview-name">${c.name}</span>
-                            <span class="pdf-preview-hint">${t("cert_btn_preview")}</span>
-                        </div>
-                    </object>
+                    <div class="pdf-preview-bg" style="background: radial-gradient(circle at 30% 40%, ${accentColor}22, transparent 70%), radial-gradient(circle at 70% 80%, ${accentColor}11, transparent 50%)"></div>
+                    <div class="pdf-preview-visual">
+                        ${iconHtml}
+                        <span class="pdf-preview-name">${c.name}</span>
+                    </div>
+                    <div class="pdf-preview-overlay">
+                        <span class="pdf-preview-hint" style="border-color: ${accentColor}; color: ${accentColor}">${t("cert_btn_preview")}</span>
+                    </div>
                 </div>
                 <div class="pdf-body">
                     <h3>${c.name}</h3>
+                    ${provider.label ? `<span class="pdf-badge" style="background: ${accentColor}22; color: ${accentColor}; border-color: ${accentColor}44">${provider.label}</span>` : ""}
                     <div class="pdf-actions">
-                        <button class="btn" onclick="openCertModal('${url}')">${t("cert_btn_preview")}</button>
+                        <button class="btn" onclick="openCertModal('${url}')" style="background: ${accentColor}; color: #fff">${t("cert_btn_preview")}</button>
                     </div>
                 </div>
             </div>`;
