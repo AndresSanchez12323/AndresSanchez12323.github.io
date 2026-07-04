@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">Edwin Andrés Sánchez Orozco | Desarrollador de Software</title>
+    <meta name="description" data-i18n="meta_desc" content="Portfolio profesional de Edwin Andrés Sánchez Orozco, desarrollador de software enfocado en soluciones eficientes, limpias y performantes.">
+    <meta name="keywords" content="desarrollador, software, portfolio, Edwin Sánchez, programación, frontend, backend, Colombia">
+    <meta name="author" content="Edwin Andrés Sánchez Orozco">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Edwin Andrés Sánchez Orozco | Desarrollador de Software">
+    <meta property="og:description" content="Portfolio profesional de desarrollo de software con enfoque en productos limpios y performantes.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://github.com/AndresSanchez12323">
+    <meta property="og:image" content="assets/img/logo.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Edwin Andrés Sánchez Orozco | Desarrollador de Software">
+    <meta name="twitter:description" content="Portfolio profesional de desarrollo de software.">
+
+    <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <video id="bg-video" autoplay loop muted playsinline aria-hidden="true">
+        <source src="assets/video/videoplayback.webm" type="video/webm">
+    </video>
+    <div class="bg-overlay" aria-hidden="true"></div>
+
+    <nav class="navbar" id="navbar" aria-label="Navegacion principal">
+        <div class="nav-inner">
+            <a href="#top" class="nav-logo">ES</a>
+            <button class="nav-toggle" id="navToggle" aria-label="Menu de navegacion">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#about" class="nav-link" data-i18n="nav_about">Sobre Mi</a></li>
+                <li><a href="#projects" class="nav-link" data-i18n="nav_projects">Proyectos</a></li>
+                <li><a href="#experience" class="nav-link" data-i18n="nav_experience">Experiencia</a></li>
+                <li><a href="#skills" class="nav-link" data-i18n="nav_skills">Skills</a></li>
+                <li><a href="#certificates" class="nav-link" data-i18n="nav_certificates">Certificados</a></li>
+                <li><a href="#contacto" class="nav-link" data-i18n="nav_contact">Contacto</a></li>
+            </ul>
+            <div class="nav-toggles">
+                <button class="nav-toggle-btn theme-btn" id="themeToggle" aria-label="Toggle theme">🌙</button>
+                <button class="nav-toggle-btn lang-btn" id="langToggle" aria-label="Toggle language">EN</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page">
+        <section class="hero" id="top">
+            <div class="hero-content">
+                <div class="hero-avatar">
+                    <img id="hero-avatar-img" alt="Edwin Sanchez">
+                </div>
+                <h1 class="hero-title">Edwin Andrés Sánchez Orozco</h1>
+                <p class="hero-subtitle"><span class="role-rotator" id="roleRotator"></span> <span data-i18n="hero_subtitle">enfocado en productos limpios y performantes. Creo soluciones eficientes con código de calidad.</span></p>
+                <div class="hero-decoration" aria-hidden="true"></div>
+                <div class="hero-actions">
+                    <a href="#projects" class="btn" data-i18n="hero_btn_projects">Ver Proyectos</a>
+                    <a href="#contacto" class="btn btn-ghost" data-i18n="hero_btn_contact">Contactar</a>
+                    <a href="https://github.com/AndresSanchez12323" target="_blank" rel="noreferrer" class="btn btn-ghost" data-i18n="hero_btn_github">GitHub</a>
+                </div>
+                <p class="scroll-indicator">
+    <span class="scroll-indicator-text"><span data-i18n="hero_scroll">Desliza</span></span>
+    <span class="scroll-indicator-arrows"><span></span><span></span></span>
+</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="about">
+            <div class="section-card reveal">
+                <h2 data-i18n="about_title">Sobre Mi</h2>
+                <p data-i18n="about_desc">Soy estudiante de octavo semestre de Ingeniería en Informática, con una fuerte motivación por aprender, construir y evolucionar dentro del ámbito tecnológico. Me interesa especialmente la programación, la resolución de problemas y la creación de soluciones que aporten valor real. He desarrollado proyectos utilizando tecnologías como JavaScript, TypeScript, Python, PHP, Java, C, C++ y HTML/CSS, además de herramientas y entornos como Linux, Shell, PowerShell y Docker. También cuento con experiencia básica en CQL y un manejo intermedio-bajo de Assembly. Me considero una persona responsable, puntual y comprometida con cada proyecto en el que participo. Busco seguir fortaleciendo mis bases técnicas mientras aporto mis conocimientos y continúo creciendo profesionalmente en el área de desarrollo de software.</p>
+            </div>
+        </section>
+
+        <section class="content-section" id="terminal">
+            <div class="section-card terminal-card reveal">
+                <div class="terminal-header" aria-hidden="true">
+                    <span class="terminal-dot dot-red"></span>
+                    <span class="terminal-dot dot-yellow"></span>
+                    <span class="terminal-dot dot-green"></span>
+                    <span class="terminal-title" data-i18n="terminal_title">perfil-dev.js</span>
+                </div>
+                <div class="terminal-body" role="region" aria-label="Terminal con datos del perfil">
+                    <div class="terminal-output" id="terminal-output"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="working-on">
+            <div class="section-card reveal">
+                <div class="working-head">
+                    <h2 data-i18n="working_title">En lo que estoy trabajando</h2>
+                    <span class="working-badge" data-i18n="working_badge">Latest</span>
+                </div>
+                <p data-i18n="working_desc">Mis repositorios con actividad reciente.</p>
+                <div class="working-grid" id="working-grid"></div>
+            </div>
+        </section>
+
+        <section class="content-section" id="projects">
+            <div class="section-card reveal">
+                <h2 data-i18n="projects_title">Proyectos Destacados</h2>
+                <p data-i18n="projects_desc">Una selecci&oacute;n curada de lo que he construido recientemente, con foco en impacto y detalle.</p>
+                <div class="projects-grid" id="projects-grid"></div>
+            </div>
+        </section>
+
+        <section class="content-section" id="experience">
+            <div class="section-card reveal">
+                <h2 data-i18n="experience_title">Experiencia</h2>
+                <div class="timeline" id="timeline"></div>
+            </div>
+        </section>
+
+        <section class="content-section" id="skills">
+            <div class="section-card reveal">
+                <h2 data-i18n="skills_title">Habilidades Principales</h2>
+                <p data-i18n="skills_desc">Lenguajes y herramientas que más uso en mis proyectos reales.</p>
+                <div class="skills-cloud" id="skills-cloud"></div>
+            </div>
+        </section>
+
+        <section class="content-section" id="github">
+            <div class="section-card reveal">
+                <h2 data-i18n="github_title">GitHub</h2>
+                <div class="github-profile" id="github-profile"></div>
+                <div class="github-repos" id="github-repos"></div>
+            </div>
+        </section>
+
+        <section class="content-section" id="certificates">
+            <div class="section-card reveal">
+                <h2 data-i18n="certificates_title">Mis Certificados</h2>
+                <p data-i18n="certificates_desc">Certificaciones oficiales que respaldan mi formación profesional.</p>
+                <div class="pdf-grid" id="certificates-grid"></div>
+            </div>
+        </section>
+
+        <section class="content-section" id="resume">
+            <div class="section-card resume-card reveal">
+                <div class="resume-inner">
+                    <div class="resume-info">
+                        <h2 data-i18n="resume_title">Hoja de Vida</h2>
+                        <p data-i18n="resume_desc">Descarga mi hoja de vida completa con experiencia, formaci&oacute;n y habilidades detalladas.</p>
+                        <div class="resume-actions">
+                            <a class="btn btn-ghost" href="javascript:void(0)" onclick="openCertModal('assets/certificates/Hoja-de-Vida.pdf')" data-i18n="resume_view">Vista Previa</a>
+                        </div>
+                    </div>
+                    <div class="resume-icon">
+                        <svg viewBox="0 0 40 40" fill="none" width="80" height="80">
+                            <rect x="4" y="2" width="32" height="36" rx="3" stroke="var(--accent)" stroke-width="1.5" fill="var(--accent-dim)"/>
+                            <line x1="11" y1="12" x2="29" y2="12" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round"/>
+                            <line x1="11" y1="18" x2="25" y2="18" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+                            <line x1="11" y1="24" x2="27" y2="24" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+                            <line x1="11" y1="30" x2="22" y2="30" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section" id="contacto">
+            <div class="section-card reveal">
+                <h2 data-i18n="social_title" style="margin-bottom:28px;text-align:center">Contacto &amp; Redes</h2>
+                <div class="social-grid">
+                    <a class="social-card" href="https://www.linkedin.com/in/edwin-andr%C3%A9s-s%C3%A1nchez-orozco-aa4b40411" target="_blank" rel="noreferrer">
+                        <span class="social-icon" aria-hidden="true">
+                            <svg class="social-icon-img" viewBox="0 0 24 24" fill="#67e8f9" width="20" height="20"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </span>
+                        <span class="social-label">LinkedIn</span>
+                    </a>
+                    <a class="social-card" href="https://www.instagram.com/andressanchez0016/" target="_blank" rel="noreferrer">
+                        <span class="social-icon" aria-hidden="true">
+                            <img class="social-icon-img" src="https://cdn.simpleicons.org/instagram/67e8f9" alt="" width="20" height="20">
+                        </span>
+                        <span class="social-label">Instagram</span>
+                    </a>
+                    <a class="social-card" href="https://steamcommunity.com/profiles/76561198914919311/" target="_blank" rel="noreferrer">
+                        <span class="social-icon" aria-hidden="true">
+                            <img class="social-icon-img" src="https://cdn.simpleicons.org/steam/67e8f9" alt="" width="20" height="20">
+                        </span>
+                        <span class="social-label">Steam</span>
+                    </a>
+                    <a class="social-card" href="https://wa.me/573104725242" target="_blank" rel="noreferrer">
+                        <span class="social-icon" aria-hidden="true">
+                            <img class="social-icon-img" src="https://cdn.simpleicons.org/whatsapp/67e8f9" alt="" width="20" height="20">
+                        </span>
+                        <span class="social-label">WhatsApp</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p data-i18n="footer_text">&copy; 2026 Edwin Andrés Sánchez Orozco. Todos los derechos reservados.</p>
+        </footer>
+    </main>
+
+    <div class="modal-overlay" id="certModal" role="dialog" aria-modal="true" aria-label="Vista previa del certificado">
+        <div class="modal-content">
+            <button class="modal-close" id="certModalClose" aria-label="Cerrar">&times;</button>
+            <iframe class="modal-iframe" id="certModalIframe" title="Certificado"></iframe>
+        </div>
+    </div>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
