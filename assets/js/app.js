@@ -9,6 +9,14 @@ let cachedProfile = null;
 let cachedRepos = null;
 let roleInterval = null;
 let terminalPlayed = false;
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+const shouldUseLiteMode = prefersReducedMotion
+    || Boolean(connection?.saveData)
+    || /(^|-)2g$/.test(connection?.effectiveType || "")
+    || window.matchMedia("(max-width: 768px)").matches
+    || (navigator.deviceMemory && navigator.deviceMemory <= 4)
+    || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
 
 const TRANSLATIONS = {
     es: {
@@ -224,6 +232,36 @@ function toggleLanguage() {
     playLanguageTransition(() => setLanguage(next));
 }
 
+function initPerformanceMode() {
+    document.body.classList.toggle("performance-lite", shouldUseLiteMode);
+}
+
+function initBackgroundVideo() {
+    const video = document.getElementById("bg-video");
+    if (!video || shouldUseLiteMode) return;
+
+    const src = video.dataset.src;
+    if (!src) return;
+
+    const loadVideo = () => {
+        if (video.querySelector("source")) return;
+        const source = document.createElement("source");
+        source.src = src;
+        source.type = "video/webm";
+        video.appendChild(source);
+        video.load();
+        video.play().catch(() => {
+            video.remove();
+        });
+    };
+
+    if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(loadVideo, { timeout: 1800 });
+    } else {
+        window.setTimeout(loadVideo, 1200);
+    }
+}
+
 function applyTranslations() {
     document.title = t("title");
     const metaDesc = document.querySelector('meta[name="description"]');
@@ -290,6 +328,7 @@ function initScrollNav() {
     const links = document.getElementById("navLinks");
     if (!nav || !links) return;
     let lastScroll = 0;
+    let ticking = false;
 
     function updateNavVisibility() {
         if (window.innerWidth <= 768) {
@@ -306,9 +345,14 @@ function initScrollNav() {
     window.addEventListener("scroll", () => {
         if (window.innerWidth <= 768) return;
         if (links.classList.contains("open")) return;
-        const current = window.scrollY;
-        nav.classList.toggle("hidden", current > lastScroll && current > 80);
-        lastScroll = current;
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+            const current = window.scrollY;
+            nav.classList.toggle("hidden", current > lastScroll && current > 80);
+            lastScroll = current;
+            ticking = false;
+        });
     }, { passive: true });
 
     window.addEventListener("resize", updateNavVisibility);
@@ -328,7 +372,11 @@ function initRoleRotator() {
         i = (i + 1) % roles.length;
     };
     update();
-    roleInterval = setInterval(update, 3000);
+    if (!prefersReducedMotion) {
+        roleInterval = setInterval(() => {
+            if (!document.hidden) update();
+        }, 3000);
+    }
 }
 
 // ============================
@@ -1299,8 +1347,10 @@ function playLanguageTransition(callback) {
 // Init
 // ============================
 document.addEventListener("DOMContentLoaded", () => {
+    initPerformanceMode();
     setTheme(getPreferredTheme());
     setLanguage(currentLang);
+    initBackgroundVideo();
 
     document.getElementById("themeToggle")?.addEventListener("click", toggleTheme);
     document.getElementById("langToggle")?.addEventListener("click", toggleLanguage);

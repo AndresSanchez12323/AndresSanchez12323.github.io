@@ -161,6 +161,11 @@ body {
     overflow-x: hidden;
 }
 
+body.performance-lite {
+    --accent-glow: rgba(103, 232, 249, 0.035);
+    --accent-glow-strong: rgba(103, 232, 249, 0.08);
+}
+
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -191,6 +196,10 @@ body {
     z-index: -1;
     opacity: 0.25;
     pointer-events: none;
+}
+
+body.performance-lite #bg-video {
+    display: none;
 }
 
 [data-theme="light"] #bg-video {
@@ -597,6 +606,8 @@ button:focus-visible,
    ============================ */
 .content-section {
     padding: 0 24px;
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 720px;
 }
 
 @media (max-width: 480px) {
@@ -660,6 +671,41 @@ button:focus-visible,
     .skill-chip { transition: none; }
     @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 60px var(--accent-glow); } }
     * { animation-duration: 0.01ms !important; }
+}
+
+body.performance-lite .navbar,
+body.performance-lite .section-card,
+body.performance-lite .timeline-item,
+body.performance-lite .modal-overlay,
+body.performance-lite .pdf-preview-overlay,
+body.performance-lite .nav-toggle {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+body.performance-lite .hero-avatar,
+body.performance-lite .timeline::before,
+body.performance-lite .timeline-dot,
+body.performance-lite .project-card:hover,
+body.performance-lite .pdf-card:hover,
+body.performance-lite .social-card:hover,
+body.performance-lite .contact-link:hover,
+body.performance-lite .btn:hover {
+    box-shadow: none;
+}
+
+body.performance-lite .hero-decoration,
+body.performance-lite .scroll-indicator-arrows,
+body.performance-lite .timeline::before,
+body.performance-lite .timeline-dot,
+body.performance-lite .working-badge,
+body.performance-lite .project-orb,
+body.performance-lite .contact-icon {
+    animation: none;
+}
+
+body.performance-lite .hero-decoration {
+    display: none;
 }
 
 .section-card {
