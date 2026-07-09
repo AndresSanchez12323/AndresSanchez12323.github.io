@@ -11,7 +11,12 @@ let roleInterval = null;
 let terminalPlayed = false;
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-const shouldUseLiteMode = true;
+const shouldUseLiteMode = prefersReducedMotion
+    || Boolean(connection?.saveData)
+    || /(^|-)2g$/.test(connection?.effectiveType || "")
+    || window.matchMedia("(max-width: 768px)").matches
+    || (navigator.deviceMemory && navigator.deviceMemory <= 4)
+    || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
 
 const TRANSLATIONS = {
     es: {
@@ -710,9 +715,11 @@ function renderSkills() {
         const slug = getLangSlug(s.name);
         const pct = (s.level || 0) / 3 * 100;
         const offset = circ * (1 - pct / 100);
-        let icon = `<span class="skill-letter" aria-hidden="true">${escapeHTML(s.name.slice(0, 2).toUpperCase())}</span>`;
+        let icon = "";
         if (slug && inlineSvgs[slug]) {
             icon = `<img class="skill-icon" src="data:image/svg+xml;base64,${btoa(inlineSvgs[slug])}" alt="" width="24" height="24" loading="lazy">`;
+        } else if (slug) {
+            icon = `<img class="skill-icon" src="https://cdn.simpleicons.org/${slug}/67e8f9" alt="" width="24" height="24" loading="lazy">`;
         }
         return `<span class="skill-chip" tabindex="0" data-lang="${s.name}">
             <span class="skill-icon-wrap">
@@ -1068,6 +1075,8 @@ function renderCertificates() {
         if (provider.icon && CERT_INLINE_ICONS[provider.icon]) {
             const b64 = btoa(CERT_INLINE_ICONS[provider.icon]);
             iconHtml = `<img class="pdf-preview-icon" src="data:image/svg+xml;base64,${b64}" alt="" width="44" height="44" loading="lazy">`;
+        } else if (provider.slug) {
+            iconHtml = `<img class="pdf-preview-icon" src="https://cdn.simpleicons.org/${provider.slug}/${accentColor.replace("#", "")}" alt="" width="44" height="44" loading="lazy">`;
         } else {
             iconHtml = `<svg class="pdf-preview-icon" viewBox="0 0 24 24" fill="${accentColor}"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/><path d="M8 12h8v2H8zm0 4h5v2H8zm0-8h3v2H8z"/></svg>`;
         }
