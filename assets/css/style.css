@@ -199,7 +199,7 @@ body.performance-lite {
 }
 
 body.performance-lite #bg-video {
-    display: none;
+    display: none !important;
 }
 
 [data-theme="light"] #bg-video {
@@ -706,6 +706,44 @@ body.performance-lite .contact-icon {
 
 body.performance-lite .hero-decoration {
     display: none;
+}
+
+body.performance-lite *,
+body.performance-lite *::before,
+body.performance-lite *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+}
+
+body.performance-lite .navbar,
+body.performance-lite .section-card,
+body.performance-lite .project-card,
+body.performance-lite .working-card,
+body.performance-lite .timeline-item,
+body.performance-lite .skill-terminal,
+body.performance-lite .modal-content,
+body.performance-lite .pdf-card,
+body.performance-lite .social-card,
+body.performance-lite .contact-link {
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+body.performance-lite .pdf-preview-icon,
+body.performance-lite .skill-ring-fill,
+body.performance-lite .github-avatar,
+body.performance-lite .project-icon,
+body.performance-lite .contact-icon {
+    filter: none !important;
+}
+
+.skill-letter {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
 }
 
 .section-card {
